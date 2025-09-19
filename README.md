@@ -2,6 +2,18 @@
 
 This repository contains the implementation of **gated attention** mechanisms based on [Qwen3](https://github.com/QwenLM/Qwen3) model architecture, along with tools for visualizing attention maps. Our modifications are based on findings from recent research that demonstrate how applying **sparse, head-specific gating after Scaled Dot-Product Attention (SDPA)** can significantly improve performance, training stability, and long-context generalization. More details are in our paper [Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free](https://arxiv.org/abs/2505.06708).
 
+
+---
+
+## 🆕 Updates
+
+**2025-09-18** — Our paper, *Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free*, has been selected as an **Oral Presentation** at **NeurIPS 2025**, placing among the top 1.5% of submissions (77 out of 5,290 accepted papers). This recognition underscores the significance and novelty of our findings in rethinking attention gating for scalable, stable, and long-context LLMs.
+
+**2025-09-10** — **Gated Attention** has been successfully integrated into the official **Qwen3-Next** architecture, as featured in Qwen’s latest research blog ([Read Here](https://qwen.ai/blog?id=4074cca80393150c248e508aa62983f9cb7d27cd&from=research.latest-advancements-list)) and deployed in the [Qwen3-Next-80B-A3B-Instruct](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct) model. This real-world adoption validates our core hypothesis: gating mechanisms significantly enhance **training stability** and **ultra-long-context performance** (up to 1M tokens).
+
+---
+
+
 ## 📚 Introduction
 
 Gating mechanisms have long been a cornerstone of neural network design, enabling dynamic control over information flow. In this work, we focus on integrating and evaluating these mechanisms within standard softmax attention layers of transformer models.
