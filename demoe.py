@@ -1,15 +1,15 @@
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Set device
-base_dir = './' # change to your hf model directory
+base_dir = './'  # change to your hf model directory
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Loop through different model variants
 for name in ['baseline', 'gate_elementwise', 'gate_headwise']:
-    
+
     # Load model and tokenizer
     model_name_or_path = f"{base_dir}/1B_{name}"
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
@@ -30,6 +30,7 @@ for name in ['baseline', 'gate_elementwise', 'gate_headwise']:
     # Extract attention scores
     attentions = outputs.attentions  # tuple of tensors: (layer) -> (batch, head, seq_len, seq_len)
 
+
     # Function to average attention scores across all heads for each layer
     def average_heads(attentions):
         averaged = []
@@ -38,6 +39,7 @@ for name in ['baseline', 'gate_elementwise', 'gate_headwise']:
             avg_attn = layer_attn.mean(dim=1).cpu().numpy()  # (batch, seq_len, seq_len)
             averaged.append(avg_attn[0])  # Take the first sample
         return averaged
+
 
     averaged_attentions = average_heads(attentions)
 

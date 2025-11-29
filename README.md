@@ -1,27 +1,43 @@
 # Gated Attention: Implementation and Visualization
 
-This repository contains the implementation of **gated attention** mechanisms based on [Qwen3](https://github.com/QwenLM/Qwen3) model architecture, along with tools for visualizing attention maps. Our modifications are based on findings from recent research that demonstrate how applying **sparse, head-specific gating after Scaled Dot-Product Attention (SDPA)** can significantly improve performance, training stability, and long-context generalization. More details are in our paper [Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free](https://arxiv.org/abs/2505.06708).
+This repository contains the implementation of **gated attention** mechanisms based
+on [Qwen3](https://github.com/QwenLM/Qwen3) model architecture, along with tools for visualizing attention maps. Our
+modifications are based on findings from recent research that demonstrate how applying **sparse, head-specific gating
+after Scaled Dot-Product Attention (SDPA)** can significantly improve performance, training stability, and long-context
+generalization. More details are in our
+paper [Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free](https://arxiv.org/abs/2505.06708).
 
 
 ---
 
 ## 🆕 Updates
 
-**2025-09-18** — Our paper, *Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free*, has been selected as an **Oral Presentation** at **NeurIPS 2025**, placing among the top 1.5% of submissions (77 out of 5,290 accepted papers). This recognition underscores the significance and novelty of our findings in rethinking attention gating for scalable, stable, and long-context LLMs.
+**2025-09-18** — Our paper, *Gated Attention for Large Language Models: Non-linearity, Sparsity, and
+Attention-Sink-Free*, has been selected as an **Oral Presentation** at **NeurIPS 2025**, placing among the top 1.5% of
+submissions (77 out of 5,290 accepted papers). This recognition underscores the significance and novelty of our findings
+in rethinking attention gating for scalable, stable, and long-context LLMs.
 
-**2025-09-10** — **Gated Attention** has been successfully integrated into the official **Qwen3-Next** architecture, as featured in Qwen’s latest research blog ([Read Here](https://qwen.ai/blog?id=4074cca80393150c248e508aa62983f9cb7d27cd&from=research.latest-advancements-list)) and deployed in the [Qwen3-Next-80B-A3B-Instruct](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct) model. This real-world adoption validates our core hypothesis: gating mechanisms significantly enhance **training stability** and **ultra-long-context performance** (up to 1M tokens).
+**2025-09-10** — **Gated Attention** has been successfully integrated into the official **Qwen3-Next** architecture, as
+featured in Qwen’s latest research
+blog ([Read Here](https://qwen.ai/blog?id=4074cca80393150c248e508aa62983f9cb7d27cd&from=research.latest-advancements-list))
+and deployed in the [Qwen3-Next-80B-A3B-Instruct](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct) model. This
+real-world adoption validates our core hypothesis: gating mechanisms significantly enhance **training stability** and *
+*ultra-long-context performance** (up to 1M tokens).
 
 ---
 
-
 ## 📚 Introduction
 
-Gating mechanisms have long been a cornerstone of neural network design, enabling dynamic control over information flow. In this work, we focus on integrating and evaluating these mechanisms within standard softmax attention layers of transformer models.
+Gating mechanisms have long been a cornerstone of neural network design, enabling dynamic control over information flow.
+In this work, we focus on integrating and evaluating these mechanisms within standard softmax attention layers of
+transformer models.
 
-We introduce a **query-dependent sparse gate** after the SDPA output (`G1`), which modulates each attention head independently using a sigmoid function. This simple yet effective change:
+We introduce a **query-dependent sparse gate** after the SDPA output (`G1`), which modulates each attention head
+independently using a sigmoid function. This simple yet effective change:
 
 - Introduces **non-linearity** into the low-rank transformation formed by value and output projections.
-- Enables **input-dependent sparsity**, preventing the "attention sink" phenomenon where early tokens dominate attention distributions.
+- Enables **input-dependent sparsity**, preventing the "attention sink" phenomenon where early tokens dominate attention
+  distributions.
 - Improves **training stability**, allowing larger learning rates.
 - Enhances **long-context extrapolation**, showing significant gains on benchmarks like RULER.
 
@@ -39,7 +55,6 @@ These models are available at [huggingface repo](https://huggingface.co/QwQZh/ga
 
 ---
 
-
 ## 🧪 Demo Usage
 
 A demo script is included to load a trained model and visualize attention maps with gating enabled.
@@ -56,31 +71,39 @@ pip install transformers matplotlib numpy torch
 python demo.py
 ```
 
-This will produce a file named `{model_name}_selected_layer_attention_maps.png`, showing attention maps for four key layers.
+This will produce a file named `{model_name}_selected_layer_attention_maps.png`, showing attention maps for four key
+layers.
 
 #### Attention Maps Comparison
 
-Below are the attention maps from **Layer 1**, **Layer 7**, **Layer 21**, and **Layer 28** of three different model variants: `baseline`, `gate_headwise`, and `gate_elementwise`. These visualizations help illustrate how gating mechanisms affect attention patterns, especially in relation to the "attention sink" phenomenon.
+Below are the attention maps from **Layer 1**, **Layer 7**, **Layer 21**, and **Layer 28** of three different model
+variants: `baseline`, `gate_headwise`, and `gate_elementwise`. These visualizations help illustrate how gating
+mechanisms affect attention patterns, especially in relation to the "attention sink" phenomenon.
 
-In the **baseline** model, we observe a strong "attention sink" effect — the **first token** consistently receives disproportionately high attention scores across multiple layers. This indicates that the model overly relies on the initial token, potentially limiting its ability to distribute attention meaningfully across other positions.
+In the **baseline** model, we observe a strong "attention sink" effect — the **first token** consistently receives
+disproportionately high attention scores across multiple layers. This indicates that the model overly relies on the
+initial token, potentially limiting its ability to distribute attention meaningfully across other positions.
 
-##### Baseline Model  
+##### Baseline Model
 
 ![baseline](baseline_selected_layer_attention_maps.png)
 
-> **Observation**: Strong diagonal dominance with significant focus on the first token (attention sink). This pattern persists across multiple layers.
+> **Observation**: Strong diagonal dominance with significant focus on the first token (attention sink). This pattern
+> persists across multiple layers.
 
-##### Gate Headwise Model  
+##### Gate Headwise Model
 
 ![headwise](gate_headwise_selected_layer_attention_maps.png)
 
-> **Observation**: Gating applied headwise reduces the attention sink effect. Attention becomes more distributed and context-dependent.
+> **Observation**: Gating applied headwise reduces the attention sink effect. Attention becomes more distributed and
+> context-dependent.
 
-##### Gate Elementwise Model  
+##### Gate Elementwise Model
 
 ![elementwise](gate_elementwise_selected_layer_attention_maps.png)
 
-> **Observation**: Elementwise gating further enhances sparsity and selectivity in attention patterns, leading to cleaner and more structured attention maps.
+> **Observation**: Elementwise gating further enhances sparsity and selectivity in attention patterns, leading to
+> cleaner and more structured attention maps.
 
 ---
 
@@ -140,7 +163,6 @@ These options can be configured in the model config under:
 ```
 
 ---
-
 
 ## 📝 Citation
 
